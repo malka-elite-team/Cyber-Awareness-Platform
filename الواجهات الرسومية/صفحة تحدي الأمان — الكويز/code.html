@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f3fcef",
+                    "on-tertiary-container": "#76231b",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#410001",
+                    "surface-container-highest": "#dce5d9",
+                    "tertiary-fixed": "#ffdad5",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#7f2a21",
+                    "on-background": "#161d16",
+                    "on-secondary-fixed-variant": "#005320",
+                    "tertiary": "#9e4036",
+                    "tertiary-container": "#ff8b7c",
+                    "outline-variant": "#bccbb9",
+                    "surface-tint": "#006e2f",
+                    "primary-fixed": "#6bff8f",
+                    "inverse-surface": "#2a322a",
+                    "on-surface-variant": "#3d4a3d",
+                    "secondary-fixed-dim": "#62df7d",
+                    "inverse-on-surface": "#ebf3e7",
+                    "primary-container": "#22c55e",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#002109",
+                    "on-primary-container": "#004b1e",
+                    "on-surface": "#161d16",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#006e2d",
+                    "surface-container-high": "#e2ebde",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#7ffc97",
+                    "secondary-container": "#7cf994",
+                    "tertiary-fixed-dim": "#ffb4a9",
+                    "on-secondary-fixed": "#002109",
+                    "background": "#f3fcef",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d4ddd0",
+                    "surface-variant": "#dce5d9",
+                    "outline": "#6d7b6c",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#4ae176",
+                    "primary": "#006e2f",
+                    "on-error": "#ffffff",
+                    "surface-container": "#e8f0e4",
+                    "surface-container-low": "#edf6ea",
+                    "on-secondary-container": "#007230",
+                    "surface-bright": "#f3fcef",
+                    "primary-fixed-dim": "#4ae176",
+                    "on-primary-fixed-variant": "#005321"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "margin": "20px",
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "base": "8px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "label-md": ["Plus Jakarta Sans"],
+                    "button": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "body-sm": ["Plus Jakarta Sans"],
+                    "h1": ["Plus Jakarta Sans"],
+                    "h2": ["Plus Jakarta Sans"],
+                    "h3": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "button": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "h1": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "h3": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f3fcef;
+        }
+        input[type="radio"]:checked + span {
+            color: var(--tw-primary-container);
+            font-weight: 600;
+        }
+        label:has(input[type="radio"]:checked) {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased pb-lg">
+<!-- Top Navigation Bar -->
+<header class="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-sm flex flex-row-reverse items-center justify-between px-4 h-16 w-full z-50 sticky top-0">
+<!-- Profile avatar removed as per request -->
+<div class="flex items-center gap-2"></div>
+</header>
+<main class="max-w-md mx-auto px-margin py-xl min-h-[calc(100vh-64px)]">
+<!-- Progress Indicator -->
+<div class="mb-xl">
+<div class="flex justify-between items-center mb-sm">
+<span class="font-label-md text-label-md text-primary">السؤال 1 من 5</span>
+<span class="font-label-md text-label-md text-outline">20% مكتمل</span>
+</div>
+<div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container transition-all duration-500 ease-out" style="width: 20%;"></div>
+</div>
+</div>
+<!-- Question Card -->
+<div class="bg-white border border-gray-200 rounded-xl p-md shadow-sm mb-lg">
+<h2 class="font-display text-2xl font-bold text-on-surface mb-lg leading-tight">ما هي كلمة المرور القوية؟</h2>
+<div class="space-y-md">
+<!-- Radio Option 1 (A) -->
+<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
+<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
+<span class="mr-md font-body-lg text-body-lg text-on-surface">123456</span>
+</label>
+<!-- Radio Option 2 (B) -->
+<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
+<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
+<span class="mr-md font-body-lg text-body-lg text-on-surface">password</span>
+</label>
+<!-- Radio Option 3 (C) - Correct Answer -->
+<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
+<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
+<span class="mr-md font-body-lg text-body-lg text-on-surface">Ab#9kL!2</span>
+</label>
+<!-- Radio Option 4 (D) -->
+<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
+<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
+<span class="mr-md font-body-lg text-body-lg text-on-surface">myname</span>
+</label>
+</div>
+</div>
+<!-- Hint Box -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex gap-md items-start">
+<span class="material-symbols-outlined text-primary" data-icon="lightbulb">lightbulb</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">تذكر: كلمة المرور هي مفتاح هويتك الرقمية الوحيد.</p>
+</div>
+<!-- Action Buttons -->
+<div class="mt-xl space-y-md">
+<button class="w-full bg-primary-container text-on-primary py-md px-lg rounded-xl font-button text-button shadow-md hover:bg-green-600 active:bg-green-700 active:scale-[0.97] active:shadow-sm transition-all duration-200">
+                تحقق من الإجابة
+            </button>
+<!-- Home button moved to bottom -->
+<button class="w-full flex items-center justify-center gap-2 text-primary hover:bg-primary/5 py-3 rounded-xl transition-colors font-button text-button">
+<span class="material-symbols-outlined text-[20px]" data-icon="home">home</span>
+                العودة للرئيسية
+            </button>
+</div>
+</main>
+</body></html>
