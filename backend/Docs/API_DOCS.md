@@ -66,6 +66,24 @@
 }
 ```
 
+### 2.3 تسجيل الخروج (Logout)
+- **Method:** `POST`
+- **Endpoint:** `/api/auth/logout`
+- **Auth Required:** ✅
+- **Description:** يقوم بإبطال جميع التوكنات النشطة للمستخدم (Revoke Refresh Tokens).
+- **Response (Success - 200):**
+```json
+{
+  "message": "Logged out successfully. All tokens revoked."
+}
+```
+- **Response (Error - 401):**
+```json
+{
+  "error": "No token provided"
+}
+```
+
 ---
 
 ## 3. مسارات النصائح (Tips Endpoints)
@@ -204,6 +222,7 @@
 | uid | String | معرف المستخدم من Firebase Auth |
 | email | String | البريد الإلكتروني |
 | createdAt | Timestamp | تاريخ إنشاء الحساب |
+| lastLogin | Timestamp | تاريخ آخر عملية تسجيل دخول ناجحة |
 
 ### 5.2 Collection: `tips`
 | Field | Type | Description |
