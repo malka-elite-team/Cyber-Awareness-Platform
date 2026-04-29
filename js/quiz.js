@@ -90,3 +90,151 @@ tailwind.config = {
           },
         },
       }
+
+const questions = [
+    {
+        question: "ما هي كلمة المرور القوية؟",
+        options: ["123456", "password", "Ab#9kL!2", "myname"],
+        correctIndex: 2,
+        hint: "تذكر: كلمة المرور هي مفتاح هويتك الرقمية الوحيد."
+    },
+    {
+        question: "ما هو أفضل تصرف عند استلام إيميل مجهول يطلب بياناتك؟",
+        options: ["الرد بالبيانات المطلوبة", "تجاهل وحذف الإيميل", "الضغط على الرابط المرفق", "توجيه الإيميل للأصدقاء"],
+        correctIndex: 1,
+        hint: "لا تثق بالمرسلين المجهولين أبداً."
+    },
+    {
+        question: "ما هي المصادقة الثنائية (2FA)؟",
+        options: ["استخدام كلمتي مرور", "طبقة حماية إضافية تتطلب خطوتين", "تغيير كلمة المرور مرتين", "برنامج مكافحة فيروسات"],
+        correctIndex: 1,
+        hint: "تعتمد على شيء تعرفه وشيء تملكه."
+    },
+    {
+        question: "كيف تحمي بياناتك من فيروسات الفدية؟",
+        options: ["الدفع للمخترق", "عمل نسخ احتياطي دوري", "إغلاق الحاسوب", "تغيير الشاشة"],
+        correctIndex: 1,
+        hint: "النسخ الاحتياطي هو الحل الأضمن لاستعادة الملفات."
+    },
+    {
+        question: "ما هو الخطر الرئيسي لشبكات الواي فاي العامة؟",
+        options: ["بطء الإنترنت", "انقطاع الاتصال", "اعتراض البيانات من قِبل المخترقين", "استهلاك بطارية الجهاز"],
+        correctIndex: 2,
+        hint: "تجنب المعاملات البنكية على الشبكات المفتوحة."
+    }
+];
+
+let currentQuestionIndex = 0;
+let score = 0;
+let hasAnswered = false;
+
+if (localStorage.getItem('isLoggedIn') !== 'true') {
+    window.location.href = 'login.html';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const questionCountEl = document.getElementById('question-count');
+    const progressTextEl = document.getElementById('progress-text');
+    const progressBarEl = document.getElementById('progress-bar');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackBox = document.getElementById('feedback-box');
+    const feedbackIcon = document.getElementById('feedback-icon');
+    const feedbackText = document.getElementById('feedback-text');
+    const actionBtn = document.getElementById('action-btn');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const finalScoreEl = document.getElementById('final-score');
+    const retryBtn = document.getElementById('retry-btn');
+
+    if (!quizScreen) return;
+
+    function loadQuestion() {
+        hasAnswered = false;
+        const q = questions[currentQuestionIndex];
+        
+        questionCountEl.textContent = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
+        const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+        progressTextEl.textContent = `${progressPercent}% مكتمل`;
+        progressBarEl.style.width = `${progressPercent}%`;
+
+        questionTextEl.textContent = q.question;
+        optionsContainer.innerHTML = '';
+        
+        q.options.forEach((opt, index) => {
+            const label = document.createElement('label');
+            label.className = "flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]";
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'security_question';
+            radio.className = "w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all";
+            radio.value = index;
+
+            const span = document.createElement('span');
+            span.className = "mr-md font-body-lg text-body-lg text-on-surface";
+            span.textContent = opt;
+
+            label.appendChild(radio);
+            label.appendChild(span);
+            optionsContainer.appendChild(label);
+        });
+
+        feedbackBox.classList.add('hidden');
+        actionBtn.textContent = 'تحقق من الإجابة';
+    }
+
+    actionBtn.addEventListener('click', () => {
+        if (!hasAnswered) {
+            const selectedOpt = document.querySelector('input[name="security_question"]:checked');
+            if (!selectedOpt) {
+                alert('يرجى اختيار إجابة أولاً');
+                return;
+            }
+
+            const selectedIndex = parseInt(selectedOpt.value);
+            const q = questions[currentQuestionIndex];
+            
+            hasAnswered = true;
+            feedbackBox.classList.remove('hidden');
+
+            if (selectedIndex === q.correctIndex) {
+                score++;
+                feedbackBox.className = "border rounded-xl p-md flex gap-md items-start mb-lg bg-green-50 border-green-200 text-green-800";
+                feedbackIcon.textContent = "check_circle";
+                feedbackText.textContent = "إجابة صحيحة! " + q.hint;
+            } else {
+                feedbackBox.className = "border rounded-xl p-md flex gap-md items-start mb-lg bg-red-50 border-red-200 text-red-800";
+                feedbackIcon.textContent = "cancel";
+                feedbackText.textContent = "إجابة خاطئة. " + q.hint;
+            }
+
+            actionBtn.textContent = 'السؤال التالي';
+        } else {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+    });
+
+    function showResults() {
+        quizScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+        finalScoreEl.textContent = `${score} / ${questions.length}`;
+        progressBarEl.style.width = `100%`;
+        progressTextEl.textContent = `100% مكتمل`;
+    }
+
+    retryBtn.addEventListener('click', () => {
+        currentQuestionIndex = 0;
+        score = 0;
+        resultScreen.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+        loadQuestion();
+    });
+
+    loadQuestion();
+});

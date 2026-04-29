@@ -88,3 +88,75 @@ tailwind.config = {
           },
         },
       }
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Login Logic
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password');
+            const errorMsg = document.getElementById('login-error');
+            
+            if (!emailInput.value.trim() || !passwordInput.value.trim()) {
+                errorMsg.classList.remove('hidden');
+                emailInput.classList.remove('border-outline-variant');
+                emailInput.classList.add('border-error');
+                passwordInput.classList.remove('border-outline-variant');
+                passwordInput.classList.add('border-error');
+            } else {
+                errorMsg.classList.add('hidden');
+                emailInput.classList.remove('border-error');
+                emailInput.classList.add('border-outline-variant');
+                passwordInput.classList.remove('border-error');
+                passwordInput.classList.add('border-outline-variant');
+                
+                localStorage.setItem('isLoggedIn', 'true');
+                alert('تم تسجيل الدخول بنجاح!');
+                window.location.href = 'index.html';
+            }
+        });
+    }
+
+    // Signup Logic
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const errorMsg = document.getElementById('signup-error');
+            const confirmInput = document.getElementById('signup-confirm-password');
+            
+            if (password !== confirmPassword) {
+                errorMsg.classList.remove('hidden');
+                confirmInput.classList.add('border-error');
+                confirmInput.classList.remove('border-gray-200');
+            } else {
+                errorMsg.classList.add('hidden');
+                confirmInput.classList.remove('border-error');
+                confirmInput.classList.add('border-gray-200');
+                
+                localStorage.setItem('isLoggedIn', 'true');
+                alert('تم إنشاء الحساب بنجاح!');
+                window.location.href = 'index.html';
+            }
+        });
+    }
+
+    // Toggle Password Visibility
+    const togglePassword = document.getElementById('toggle-password');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', () => {
+            const passwordInput = document.getElementById('signup-password');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePassword.textContent = 'visibility';
+            } else {
+                passwordInput.type = 'password';
+                togglePassword.textContent = 'visibility_off';
+            }
+        });
+    }
+});

@@ -34,13 +34,13 @@
 <p class="font-body-md text-body-md text-on-surface-variant">قم بإنشاء حسابك للوصول إلى كافة المميزات.</p>
 </div>
 <!-- Registration Form -->
-<form class="space-y-6">
+<form id="signup-form" class="space-y-6">
 <!-- Email Field -->
 <div class="space-y-2">
 <label class="font-label-md text-label-md text-on-surface-variant block">البريد الإلكتروني</label>
 <div class="relative group">
 <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-container transition-colors" data-icon="mail">mail</span>
-<input class="w-full pr-11 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none font-body-md text-body-md" placeholder="example@domain.com" required="" type="email"/>
+<input id="signup-email" class="w-full pr-11 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none font-body-md text-body-md" placeholder="example@domain.com" required="" type="email"/>
 </div>
 </div>
 <!-- Password Field -->
@@ -48,13 +48,13 @@
 <label class="font-label-md text-label-md text-on-surface-variant block">كلمة المرور</label>
 <div class="relative group">
 <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-container transition-colors" data-icon="lock">lock</span>
-<input class="w-full pr-11 py-3 bg-white border border-error rounded-lg focus:ring-2 focus:ring-error/20 focus:border-error transition-all outline-none font-body-md text-body-md" placeholder="••••••••" required="" type="password"/>
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline cursor-pointer" data-icon="visibility">visibility</span>
+<input id="signup-password" class="w-full pr-11 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none font-body-md text-body-md" placeholder="••••••••" required="" type="password"/>
+<span id="toggle-password" class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline cursor-pointer" data-icon="visibility">visibility_off</span>
 </div>
 <!-- Error Message - Defined in Requirements -->
-<div class="flex items-center gap-1 mt-1">
+<div id="signup-error" class="flex items-center gap-1 mt-1 hidden">
 <span class="material-symbols-outlined text-[16px] text-[#EF4444]" data-icon="error">error</span>
-<p class="font-caption text-caption text-[#EF4444]">كلمة المرور يجب أن تكون قوية</p>
+<p class="font-caption text-caption text-[#EF4444]">كلمتا المرور غير متطابقتين</p>
 </div>
 </div>
 <!-- Confirm Password Field -->
@@ -62,7 +62,7 @@
 <label class="font-label-md text-label-md text-on-surface-variant block">تأكيد كلمة المرور</label>
 <div class="relative group">
 <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary-container transition-colors" data-icon="lock_reset">lock_reset</span>
-<input class="w-full pr-11 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none font-body-md text-body-md" placeholder="••••••••" required="" type="password"/>
+<input id="signup-confirm-password" class="w-full pr-11 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none font-body-md text-body-md" placeholder="••••••••" required="" type="password"/>
 </div>
 </div>
 <!-- Primary Action Button -->
@@ -75,7 +75,7 @@
 <div class="mt-8 pt-6 border-t border-gray-100 text-center">
 <p class="font-body-md text-body-md text-on-surface-variant">
                     عندك حساب؟ 
-                    <a class="text-primary-container font-bold hover:underline mr-1 transition-all" href="#">سجّل دخول</a>
+                    <a class="text-primary-container font-bold hover:underline mr-1 transition-all" href="login.html">سجّل دخول</a>
 </p>
 </div>
 <!-- Social Registration Alternative (Bento Style Suggestion) -->

@@ -17,57 +17,60 @@
 <div class="flex items-center gap-2"></div>
 </header>
 <main class="max-w-md mx-auto px-margin py-xl min-h-[calc(100vh-64px)]">
-<!-- Progress Indicator -->
-<div class="mb-xl">
-<div class="flex justify-between items-center mb-sm">
-<span class="font-label-md text-label-md text-primary">السؤال 1 من 5</span>
-<span class="font-label-md text-label-md text-outline">20% مكتمل</span>
-</div>
-<div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-<div class="h-full bg-primary-container transition-all duration-500 ease-out" style="width: 20%;"></div>
-</div>
-</div>
-<!-- Question Card -->
-<div class="bg-white border border-gray-200 rounded-xl p-md shadow-sm mb-lg">
-<h2 class="font-display text-2xl font-bold text-on-surface mb-lg leading-tight">ما هي كلمة المرور القوية؟</h2>
-<div class="space-y-md">
-<!-- Radio Option 1 (A) -->
-<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
-<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
-<span class="mr-md font-body-lg text-body-lg text-on-surface">123456</span>
-</label>
-<!-- Radio Option 2 (B) -->
-<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
-<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
-<span class="mr-md font-body-lg text-body-lg text-on-surface">password</span>
-</label>
-<!-- Radio Option 3 (C) - Correct Answer -->
-<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
-<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
-<span class="mr-md font-body-lg text-body-lg text-on-surface">Ab#9kL!2</span>
-</label>
-<!-- Radio Option 4 (D) -->
-<label class="flex items-center p-md border border-gray-200 rounded-xl cursor-pointer hover:bg-surface transition-all active:scale-[0.98]">
-<input class="w-5 h-5 text-primary-container focus:ring-primary border-gray-300 transition-all" name="security_question" type="radio"/>
-<span class="mr-md font-body-lg text-body-lg text-on-surface">myname</span>
-</label>
-</div>
-</div>
-<!-- Hint Box -->
-<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex gap-md items-start">
-<span class="material-symbols-outlined text-primary" data-icon="lightbulb">lightbulb</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant">تذكر: كلمة المرور هي مفتاح هويتك الرقمية الوحيد.</p>
-</div>
-<!-- Action Buttons -->
-<div class="mt-xl space-y-md">
-<button class="w-full bg-primary-container text-on-primary py-md px-lg rounded-xl font-button text-button shadow-md hover:bg-green-600 active:bg-green-700 active:scale-[0.97] active:shadow-sm transition-all duration-200">
-                تحقق من الإجابة
+    <!-- Quiz Screen -->
+    <div id="quiz-screen">
+        <!-- Progress Indicator -->
+        <div class="mb-xl">
+        <div class="flex justify-between items-center mb-sm">
+        <span id="question-count" class="font-label-md text-label-md text-primary">السؤال 1 من 5</span>
+        <span id="progress-text" class="font-label-md text-label-md text-outline">20% مكتمل</span>
+        </div>
+        <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+        <div id="progress-bar" class="h-full bg-primary-container transition-all duration-500 ease-out" style="width: 20%;"></div>
+        </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-white border border-gray-200 rounded-xl p-md shadow-sm mb-lg">
+        <h2 id="question-text" class="font-display text-2xl font-bold text-on-surface mb-lg leading-tight"></h2>
+        <div id="options-container" class="space-y-md">
+            <!-- Options will be injected here -->
+        </div>
+        </div>
+
+        <!-- Hint / Feedback Box -->
+        <div id="feedback-box" class="hidden border rounded-xl p-md flex gap-md items-start mb-lg">
+        <span id="feedback-icon" class="material-symbols-outlined"></span>
+        <p id="feedback-text" class="font-body-sm text-body-sm"></p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-xl space-y-md">
+        <button id="action-btn" class="w-full bg-primary-container text-on-primary py-md px-lg rounded-xl font-button text-button shadow-md hover:bg-green-600 active:bg-green-700 active:scale-[0.97] active:shadow-sm transition-all duration-200">
+            تحقق من الإجابة
+        </button>
+        </div>
+    </div>
+
+    <!-- Final Result Screen -->
+    <div id="result-screen" class="hidden text-center bg-white border border-gray-200 rounded-xl p-xl shadow-sm mt-10">
+        <span class="material-symbols-outlined text-6xl text-primary-container mb-4" data-icon="emoji_events">emoji_events</span>
+        <h2 class="font-display text-3xl font-bold text-on-surface mb-2">اكتمل التحدي!</h2>
+        <p class="font-body-lg text-on-surface-variant mb-6">نتيجتك هي: <span id="final-score" class="font-bold text-primary"></span></p>
+        
+        <div class="space-y-md">
+            <button id="retry-btn" class="w-full bg-primary-container text-on-primary py-md px-lg rounded-xl font-button text-button shadow-md hover:bg-green-600 transition-all duration-200">
+                إعادة المحاولة
             </button>
-<!-- Home button moved to bottom -->
-<button class="w-full flex items-center justify-center gap-2 text-primary hover:bg-primary/5 py-3 rounded-xl transition-colors font-button text-button">
-<span class="material-symbols-outlined text-[20px]" data-icon="home">home</span>
-                العودة للرئيسية
-            </button>
-</div>
+        </div>
+    </div>
+
+    <!-- Home button (Shared) -->
+    <div class="mt-xl space-y-md">
+        <button onclick="window.location.href='index.html'" class="w-full flex items-center justify-center gap-2 text-primary hover:bg-primary/5 py-3 rounded-xl transition-colors font-button text-button">
+        <span class="material-symbols-outlined text-[20px]" data-icon="home">home</span>
+        العودة للرئيسية
+        </button>
+    </div>
 </main>
 </body></html>
