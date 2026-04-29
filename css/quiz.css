@@ -1,0 +1,14 @@
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+body {
+    background-color: #f3fcef;
+}
+input[type="radio"]:checked + span {
+    color: var(--tw-primary-container);
+    font-weight: 600;
+}
+label:has(input[type="radio"]:checked) {
+    border-color: #22c55e;
+    background-color: #f0fdf4;
+}
