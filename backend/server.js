@@ -71,7 +71,12 @@ app.use(async (req, res, next) => {
 
   try {
     // الطبقة 2: فحص عبر Upstash
-    const { success, remaining } = await globalRatelimit.limit(ip);
+    const { success, limit, reset, remaining } = await globalRatelimit.limit(ip);
+
+    // إرسال الترويسات (Headers) ليعرف المستخدم حالة الـ Rate Limit
+    res.setHeader('X-RateLimit-Limit', limit);
+    res.setHeader('X-RateLimit-Remaining', remaining);
+    res.setHeader('X-RateLimit-Reset', reset);
 
     if (!success) {
       globalBlockedIPs.set(ip, Date.now() + 60 * 1000); // حظر لمدة دقيقة محلياً
