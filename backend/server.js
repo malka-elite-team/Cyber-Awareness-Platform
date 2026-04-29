@@ -38,10 +38,11 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/auth');
 const tipsRoutes = require('./routes/tips');
 const quizRoutes = require('./routes/quiz');
+const verifyToken = require('./middleware/verifyToken');
 
 app.use('/api/auth', authRoutes);
-app.use('/api/tips', tipsRoutes);
-app.use('/api/quiz', quizRoutes);
+app.use('/api/tips', verifyToken, tipsRoutes);
+app.use('/api/quiz', verifyToken, quizRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

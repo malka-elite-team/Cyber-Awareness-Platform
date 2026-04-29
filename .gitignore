@@ -5,3 +5,6 @@ Tasks/
 backend/node_modules/
 backend/.env
 /Docs/
+node_modules/
+postman/
+.postman
