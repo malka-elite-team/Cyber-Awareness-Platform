@@ -96,10 +96,11 @@
 ```json
 [
   {
-    "id": "0",
-    "icon": "lock_person",
+    "id": "tip_001",
     "title": "كيف تحمي حسابك",
-    "desc": "استخدم المصادقة الثنائية (2FA) لإضافة طبقة أمان إضافية..."
+    "description": "استخدم المصادقة الثنائية (2FA)...",
+    "icon": "shield",
+    "order": 1
   },
   ...
 ]
@@ -107,7 +108,7 @@
 - **Response (Error - 401):**
 ```json
 {
-  "error": "Unauthorized. Token missing or invalid."
+  "error": "Access denied. No token provided."
 }
 ```
 
@@ -118,16 +119,11 @@
 - **Response (Success - 200):**
 ```json
 {
-  "id": "0",
-  "icon": "lock_person",
+  "id": "tip_001",
   "title": "كيف تحمي حسابك",
-  "desc": "وصف كامل ومفصل للنصيحة...",
-  "steps": [
-    "قم بتفعيل خيار المصادقة الثنائية من الإعدادات",
-    "استخدم تطبيق مصادقة موثوق",
-    "لا تشارك رموز التحقق",
-    "احتفظ برموز الاسترداد في مكان آمن"
-  ]
+  "description": "استخدم المصادقة الثنائية (2FA)...",
+  "icon": "shield",
+  "order": 1
 }
 ```
 - **Response (Error - 404):**
@@ -145,15 +141,15 @@
 - **Method:** `GET`
 - **Endpoint:** `/api/quiz/questions`
 - **Auth Required:** ✅
+- **Description:** يجلب الأسئلة مع إخفاء الإجابة الصحيحة (لأسباب أمنية).
 - **Response (Success - 200):**
 ```json
 [
   {
-    "id": "q1",
+    "id": "q_001",
     "question": "ما هي كلمة المرور القوية؟",
     "options": ["123456", "password", "Ab#9kL!2", "myname"],
-    "correctIndex": 2,
-    "hint": "تذكر: كلمة المرور هي مفتاح هويتك الرقمية الوحيد."
+    "hint": "كلمة المرور هي مفتاح هويتك الرقمية الوحيد."
   },
   ...
 ]
@@ -165,28 +161,28 @@
 }
 ```
 
-### 4.2 إرسال نتيجة الكويز (Submit)
+### 4.2 إرسال الإجابات وحساب النتيجة (Submit)
 - **Method:** `POST`
 - **Endpoint:** `/api/quiz/submit`
 - **Auth Required:** ✅
-- **Request Body:**
+- **Request Body:** يجب إرسال مصفوفة الإجابات بنفس ترتيب الأسئلة المرجعة من المسار السابق.
 ```json
 {
-  "score": 4,
-  "totalQuestions": 5
+  "answers": [2, 1, 2, 1, 2]
 }
 ```
 - **Response (Success - 200):**
 ```json
 {
-  "message": "Result saved successfully",
+  "score": 4,
+  "total": 5,
   "percentage": 80
 }
 ```
 - **Response (Error - 400):**
 ```json
 {
-  "error": "Invalid data format"
+  "error": "Answers array is required"
 }
 ```
 
@@ -198,17 +194,22 @@
 ```json
 [
   {
+    "id": "A1B2C3D4",
+    "userId": "uid_xxx",
     "score": 4,
-    "totalQuestions": 5,
+    "total": 5,
     "percentage": 80,
-    "submittedAt": "2026-04-29T18:00:00Z"
+    "date": {
+      "_seconds": 1714500000,
+      "_nanoseconds": 0
+    }
   }
 ]
 ```
 - **Response (Error - 401):**
 ```json
 {
-  "error": "Unauthorized"
+  "error": "Access denied. No token provided."
 }
 ```
 
@@ -224,32 +225,30 @@
 | createdAt | Timestamp | تاريخ إنشاء الحساب |
 | lastLogin | Timestamp | تاريخ آخر عملية تسجيل دخول ناجحة |
 
-### 5.2 Collection: `tips`
+### 5.2 Collection: `tips` (Document ID = tip_001, ...)
 | Field | Type | Description |
 |---|---|---|
-| icon | String | اسم الأيقونة (Material Symbol) |
+| icon | String | اسم الأيقونة |
 | title | String | عنوان النصيحة |
-| desc | String | الوصف المختصر |
-| steps | Array (String) | الخطوات العملية |
+| description | String | الوصف المختصر |
 | order | Number | ترتيب العرض في الصفحة الرئيسية |
 
-### 5.3 Collection: `quiz_questions`
+### 5.3 Collection: `quiz_questions` (Document ID = q_001, ...)
 | Field | Type | Description |
 |---|---|---|
 | question | String | نص السؤال |
 | options | Array (String) | قائمة الخيارات |
-| correctIndex | Number | مؤشر الإجابة الصحيحة (0-3) |
+| correct | Number | مؤشر الإجابة الصحيحة (0-3) - مخفي في الـ API |
 | hint | String | التلميح |
-| order | Number | ترتيب السؤال في الاختبار |
 
 ### 5.4 Collection: `quiz_results`
 | Field | Type | Description |
 |---|---|---|
 | userId | String | معرف المستخدم صاحب النتيجة |
 | score | Number | عدد الإجابات الصحيحة |
-| totalQuestions | Number | إجمالي عدد الأسئلة |
+| total | Number | إجمالي عدد الأسئلة |
 | percentage | Number | النسبة المئوية (80، 100، إلخ) |
-| submittedAt | Timestamp | تاريخ تقديم الاختبار |
+| date | Timestamp | تاريخ تقديم الاختبار |
 
 ---
 
