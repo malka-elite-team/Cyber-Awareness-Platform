@@ -1,6 +1,80 @@
 const express = require('express');
 const admin = require('firebase-admin');
+const { Redis } = require('@upstash/redis');
+const { Ratelimit } = require('@upstash/ratelimit');
 const router = express.Router();
+
+// Setup Upstash Redis Client (using Vercel KV environment variables)
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
+
+// Create a new Ratelimit instance (20 requests per 15 minutes)
+// 20 is reasonable for normal users (typos, refreshes, etc.)
+// but blocks automated brute force attacks
+const upstashRatelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(20, '15 m'),
+  analytics: true,
+});
+
+// ============================================================
+// طبقة حماية محلية (Local Blocklist)
+// تمنع استنزاف حصة Upstash المجانية
+// إذا IP محظور، نرفضه من الذاكرة مباشرة بدون ما نسأل Redis
+// ============================================================
+const blockedIPs = new Map(); // { ip: unblockTimestamp }
+
+// تنظيف الـ IPs المنتهية كل 5 دقائق لمنع تراكم الذاكرة
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, unblockTime] of blockedIPs) {
+    if (now > unblockTime) {
+      blockedIPs.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// Custom Middleware for Auth Routes
+const authLimiter = async (req, res, next) => {
+  // Get client IP (works locally and on Vercel)
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  
+  // === الطبقة 1: فحص محلي (بدون استهلاك Upstash) ===
+  const blockedUntil = blockedIPs.get(ip);
+  if (blockedUntil && Date.now() < blockedUntil) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+
+  try {
+    // === الطبقة 2: فحص عبر Upstash Redis ===
+    const { success, limit, reset, remaining } = await upstashRatelimit.limit(ip);
+    
+    // Set standard rate limit headers
+    res.setHeader('X-RateLimit-Limit', limit);
+    res.setHeader('X-RateLimit-Remaining', remaining);
+    res.setHeader('X-RateLimit-Reset', reset);
+
+    if (!success) {
+      // حفظ الـ IP في القائمة المحلية لمدة 15 دقيقة
+      // أي طلب قادم من نفس الـ IP سيُرفض محلياً بدون سؤال Redis
+      blockedIPs.set(ip, Date.now() + 15 * 60 * 1000);
+      return res.status(429).json({ error: 'Too many requests from this IP, please try again after 15 minutes' });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Rate limit error:', error);
+    // Fail CLOSED: if Redis is down, block requests to be safe
+    // أفضل نحمي المستخدمين ونرفض الطلب من أن نفتح الباب للمهاجمين
+    res.status(503).json({ error: 'Service temporarily unavailable. Please try again later.' });
+  }
+};
+
+// Apply rate limiter to register and login
+router.use('/register', authLimiter);
+router.use('/login', authLimiter);
 
 // ==========================================
 // POST /api/auth/register — إنشاء حساب جديد
@@ -13,9 +87,13 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
-  // التحقق من طول كلمة المرور
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  // سياسة كلمة مرور قوية (Ethical Hacking Recommendation)
+  // كحد أدنى 8 حروف، رقم، حرف كبير، رمز خاص
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ 
+      error: 'Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.' 
+    });
   }
 
   try {
