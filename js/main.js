@@ -135,6 +135,48 @@ document.addEventListener('DOMContentLoaded', async () => {
             grid.innerHTML = '<p class="text-error col-span-full text-center py-4">حدث خطأ أثناء تحميل النصائح. يرجى المحاولة لاحقاً.</p>';
         }
     }
+
+    try {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const progressRes = await fetch(`${API_BASE_URL}/api/quiz/progress`, {
+                headers: { 
+                    "Authorization": `Bearer ${token}`,
+                    "ngrok-skip-browser-warning": "true"
+                }
+            });
+            if (progressRes.ok) {
+                const progressData = await progressRes.json();
+                const progressTextEl = document.getElementById('learning-progress-text');
+                const progressBarEl = document.getElementById('learning-progress-bar');
+                const continueBtn = document.getElementById('continue-learning-btn');
+                
+                if (progressTextEl) {
+                    progressTextEl.textContent = `لقد أكملت ${progressData.completedTips} من أصل ${progressData.totalTips}`;
+                }
+                if (progressBarEl) {
+                    progressBarEl.style.width = `${progressData.progressPercentage}%`;
+                }
+                if (continueBtn) {
+                    continueBtn.addEventListener('click', () => {
+                        if (progressData.nextTipId) {
+                            window.location.href = `article.html?id=${progressData.nextTipId}`;
+                        } else {
+                            alert('تم إنهاء الدورة بنجاح!');
+                        }
+                    });
+                    if (!progressData.nextTipId) {
+                        continueBtn.innerHTML = `
+                        <span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+                        تم إنهاء الدورة
+                        `;
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Failed to fetch progress:', error);
+    }
 });
 
 if (!localStorage.getItem('token')) {

@@ -51,12 +51,12 @@
 <section class="mt-xl bg-surface-container rounded-xl p-lg flex flex-col md:flex-row items-center gap-md">
 <div class="flex-1">
 <h3 class="font-h3 text-h3 text-on-surface mb-xs">تقدمك في التعلم</h3>
-<p class="font-body-md text-on-surface-variant mb-md">لقد أكملت 3 من أصل 10 دروس أساسية هذا الأسبوع.</p>
+<p id="learning-progress-text" class="font-body-md text-on-surface-variant mb-md">لقد أكملت 3 من أصل 10 دروس أساسية هذا الأسبوع.</p>
 <div class="w-full bg-white rounded-full h-2.5 mb-4 overflow-hidden">
-<div class="bg-primary-container h-full rounded-full" style="width: 30%"></div>
+<div id="learning-progress-bar" class="bg-primary-container h-full rounded-full" style="width: 30%"></div>
 </div>
 </div>
-<button onclick="window.location.href='article.html?id=3'" class="bg-primary text-white font-label-bold px-md py-sm rounded-lg hover:opacity-90 transition-all flex items-center gap-2">
+<button id="continue-learning-btn" class="bg-primary text-white font-label-bold px-md py-sm rounded-lg hover:opacity-90 transition-all flex items-center gap-2">
 <span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
                 مواصلة التعلم
             </button>
