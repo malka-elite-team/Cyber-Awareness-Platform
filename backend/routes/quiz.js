@@ -4,12 +4,21 @@ const router = express.Router();
 
 // ==========================================
 // GET /api/quiz/questions — جلب الأسئلة
+// يقبل ?tipId=xxx لجلب أسئلة نصيحة معينة
 // ==========================================
 router.get('/questions', async (req, res) => {
   try {
+    const { tipId } = req.query;
     const db = admin.firestore();
-    // Use FieldPath.documentId() since the ID is the document ID, not a field
-    const questionsSnapshot = await db.collection('quiz_questions').orderBy(admin.firestore.FieldPath.documentId(), 'asc').get();
+    
+    let query = db.collection('quiz_questions');
+    if (tipId) {
+      query = query.where('tipId', '==', tipId);
+    } else {
+      query = query.orderBy(admin.firestore.FieldPath.documentId(), 'asc');
+    }
+    
+    const questionsSnapshot = await query.get();
     
     const questions = [];
     questionsSnapshot.forEach(doc => {
@@ -18,6 +27,11 @@ router.get('/questions', async (req, res) => {
       const { correct, ...safeData } = data;
       questions.push({ id: doc.id, ...safeData });
     });
+
+    // إذا تم الفلترة بواسطة tipId، نرتب النتائج محلياً لتجنب مشاكل الـ Indexes
+    if (tipId) {
+      questions.sort((a, b) => a.id.localeCompare(b.id));
+    }
 
     res.status(200).json(questions);
   } catch (error) {
@@ -31,7 +45,7 @@ router.get('/questions', async (req, res) => {
 // ==========================================
 router.post('/submit', async (req, res) => {
   try {
-    const { answers } = req.body;
+    const { answers, tipId } = req.body;
     
     if (!answers || !Array.isArray(answers)) {
       return res.status(400).json({ error: 'Answers array is required' });
@@ -39,10 +53,20 @@ router.post('/submit', async (req, res) => {
 
     const db = admin.firestore();
     
-    // جلب الأسئلة الصحيحة من قاعدة البيانات لحساب النتيجة
-    const questionsSnapshot = await db.collection('quiz_questions').orderBy(admin.firestore.FieldPath.documentId(), 'asc').get();
+    let query = db.collection('quiz_questions');
+    if (tipId) {
+      query = query.where('tipId', '==', tipId);
+    } else {
+      query = query.orderBy(admin.firestore.FieldPath.documentId(), 'asc');
+    }
+    
+    const questionsSnapshot = await query.get();
     const questions = [];
-    questionsSnapshot.forEach(doc => questions.push(doc.data()));
+    questionsSnapshot.forEach(doc => questions.push({ id: doc.id, ...doc.data() }));
+
+    if (tipId) {
+      questions.sort((a, b) => a.id.localeCompare(b.id));
+    }
 
     if (answers.length !== questions.length) {
       return res.status(400).json({ error: `Expected ${questions.length} answers, but got ${answers.length}` });
@@ -57,7 +81,7 @@ router.post('/submit', async (req, res) => {
     }
 
     const total = questions.length;
-    const percentage = Math.round((score / total) * 100);
+    const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
     // حفظ النتيجة في Firestore
     // req.user يأتي من الـ verifyToken middleware

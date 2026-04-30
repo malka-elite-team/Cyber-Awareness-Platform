@@ -12,24 +12,9 @@ const PORT = process.env.PORT || 3000;
 // Security Middleware
 app.use(helmet()); // Sets various HTTP headers for security
 
-// Strict CORS Configuration
-const allowedOrigins = [
-  'https://cyber-awareness-platform-beta.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5173' // Common Vite port
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  }
-}));
+// Strict CORS Configuration (Temporarily Disabled for Frontend Dev - Mahmoud)
+// TODO: Revert this before production! Check backend/Docs/TEMP_CORS_BYPASS.md
+app.use(cors());
 
 app.use(express.json({ limit: '10kb' })); // Limit body size to prevent DoS
 

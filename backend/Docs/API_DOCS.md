@@ -231,15 +231,29 @@
 | icon | String | اسم الأيقونة |
 | title | String | عنوان النصيحة |
 | description | String | الوصف المختصر |
+| steps | Array (String) | قائمة الخطوات العملية لتطبيق النصيحة |
 | order | Number | ترتيب العرض في الصفحة الرئيسية |
 
 ### 5.3 Collection: `quiz_questions` (Document ID = q_001, ...)
 | Field | Type | Description |
 |---|---|---|
+| tipId | String | مُعرّف النصيحة التي يتبع لها هذا السؤال (مثال: tip_001) |
 | question | String | نص السؤال |
 | options | Array (String) | قائمة الخيارات |
 | correct | Number | مؤشر الإجابة الصحيحة (0-3) - مخفي في الـ API |
 | hint | String | التلميح |
+
+---
+
+### ملاحظة هامة لمسارات الكويز (Quiz API Updates):
+1. **`GET /api/quiz/questions`**: يقبل الآن مُعامل بحث `?tipId=xxx` لجلب أسئلة مخصصة لنصيحة معينة.
+2. **`POST /api/quiz/submit`**: يجب إرسال `tipId` في الـ Body (إلى جانب الـ `answers`) إذا كان المستخدم يمتحن لنصيحة محددة، لكي يقوم الـ Backend بحساب النتيجة بناءً على هذه الأسئلة فقط:
+   ```json
+   {
+     "answers": [0, 2],
+     "tipId": "tip_001"
+   }
+   ```
 
 ### 5.4 Collection: `quiz_results`
 | Field | Type | Description |
