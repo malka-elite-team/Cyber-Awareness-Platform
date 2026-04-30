@@ -1,0 +1,9 @@
+:root {
+  --primary: #22C55E;
+  --secondary: #16A34A;
+  --bg: #FFFFFF;
+  --text: #000000;
+  --error: #EF4444;
+  --radius: 8px;
+  --font: 'Almarai', sans-serif;
+}

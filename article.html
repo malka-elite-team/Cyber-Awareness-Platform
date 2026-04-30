@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/global.css">
+    <script type="module" src="js/article.js"></script>
+</head>
+<body class="bg-[#f3fcef] text-[#161d16] font-['Inter'] antialiased min-h-screen">
+    <!-- TopAppBar -->
+    <header class="bg-white border-b border-gray-200 flex justify-between items-center w-full px-4 h-16 sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='index.html'" class="p-2 hover:bg-gray-50 transition-colors rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-[#22C55E]" data-icon="arrow_forward">arrow_forward</span>
+            </button>
+            <h1 class="text-lg font-bold text-[#22C55E] tracking-tight font-['Manrope']">تفاصيل النصيحة</h1>
+        </div>
+    </header>
+
+    <main class="max-w-[800px] mx-auto px-6 py-10 pb-16">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div class="w-16 h-16 rounded-xl bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] mb-6">
+                <span id="article-icon" class="material-symbols-outlined text-4xl">article</span>
+            </div>
+            <h2 id="article-title" class="text-3xl font-bold font-['Manrope'] text-[#006e2f] mb-4">جاري التحميل...</h2>
+            <div class="h-1 w-20 bg-[#22C55E] rounded-full mb-8"></div>
+            
+            <div class="prose prose-lg text-gray-700 leading-relaxed space-y-6">
+                <p id="article-desc" class="text-xl font-medium text-gray-800"></p>
+                
+                <div class="bg-[#f3fcef] p-6 rounded-xl border border-[#22C55E]/20 mt-8">
+                    <h3 class="font-bold text-[#006e2f] mb-3 font-['Manrope'] flex items-center gap-2">
+                        <span class="material-symbols-outlined">lightbulb</span>
+                        خطوات عملية للتطبيق:
+                    </h3>
+                    <ul id="article-steps" class="list-disc list-inside space-y-3 text-gray-700 ml-4">
+                        <!-- Steps will be injected here -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-12 flex justify-end">
+                <button id="quiz-btn" class="inline-flex items-center gap-2 bg-[#22C55E] hover:bg-[#1eb054] text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform hover:-translate-y-1">
+                    <span class="material-symbols-outlined">shield</span>
+                    <span>اختبر معلوماتك الآن</span>
+                </button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
