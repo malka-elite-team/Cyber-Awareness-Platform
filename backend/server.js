@@ -13,10 +13,10 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet()); // Sets various HTTP headers for security
 
 const allowedOrigins = [
+  'https://cyber-awareness-platform-beta.vercel.app',
   'http://localhost:3000',
-  'http://localhost:5173', // Common Vite port
-  'http://127.0.0.1:5500' // Local Live Server
-  // Note: Vercel frontend on the same domain sends no origin (same-origin), so it is allowed by default.
+  'http://localhost:5173',
+  'http://127.0.0.1:5500'
 ];
 
 app.use(cors({
