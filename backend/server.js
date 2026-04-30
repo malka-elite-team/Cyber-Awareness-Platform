@@ -12,9 +12,23 @@ const PORT = process.env.PORT || 3000;
 // Security Middleware
 app.use(helmet()); // Sets various HTTP headers for security
 
-// Strict CORS Configuration (Temporarily Disabled for Frontend Dev - Mahmoud)
-// TODO: Revert this before production! Check backend/Docs/TEMP_CORS_BYPASS.md
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173', // Common Vite port
+  'http://127.0.0.1:5500' // Local Live Server
+  // Note: Vercel frontend on the same domain sends no origin (same-origin), so it is allowed by default.
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 app.use(express.json({ limit: '10kb' })); // Limit body size to prevent DoS
 
