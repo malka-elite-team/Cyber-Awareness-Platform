@@ -1,98 +1,68 @@
-if (localStorage.getItem('isLoggedIn') !== 'true') {
+import { API_BASE_URL } from './config.js';
+
+if (!localStorage.getItem('token') && localStorage.getItem('isLoggedIn') !== 'true') {
     window.location.href = 'login.html';
 }
 
-const tipsData = [
-    {
-        icon: 'lock_person',
-        title: 'كيف تحمي حسابك',
-        desc: 'استخدم المصادقة الثنائية (2FA) لإضافة طبقة أمان إضافية تحمي حساباتك من الاختراق حتى لو تم تسريب كلمة المرور.',
-        steps: [
-            'قم بتفعيل خيار المصادقة الثنائية (2FA) من إعدادات الأمان في حسابك.',
-            'استخدم تطبيق مصادقة مثل Google Authenticator بدلاً من الرسائل النصية القصيرة إن أمكن.',
-            'لا تشارك رموز التحقق التي تصلك مع أي شخص آخر تحت أي ظرف.',
-            'احتفظ برموز الاسترداد الاحتياطية في مكان آمن للوصول لحسابك في حال فقدان هاتفك.'
-        ]
-    },
-    {
-        icon: 'mail',
-        title: 'تأمين البريد الإلكتروني',
-        desc: 'كن حذراً من رسائل التصيد الاحتيالي. لا تنقر على روابط مشبوهة أو تحمل ملفات من مصادر غير معروفة أبداً.',
-        steps: [
-            'تأكد دائماً من عنوان البريد الإلكتروني للمرسل، وليس فقط اسم العرض.',
-            'تجنب النقر على الروابط المرفقة مباشرة؛ بدلاً من ذلك، اكتب عنوان الموقع يدوياً في المتفصح.',
-            'احذر من الرسائل التي تطلب معلومات شخصية أو مالية بشكل عاجل.',
-            'استخدم برامج مكافحة الفيروسات لفحص المرفقات قبل فتحها.'
-        ]
-    },
-    {
-        icon: 'password',
-        title: 'إدارة كلمات المرور',
-        desc: 'استخدم كلمات مرور قوية وفريدة لكل حساب. ننصح باستخدام برامج إدارة كلمات المرور لتخزينها بأمان.',
-        steps: [
-            'اجعل كلمة المرور طويلة (12 حرفاً على الأقل) ومتنوعة (حروف كبيرة وصغيرة، أرقام، رموز).',
-            'لا تستخدم معلومات شخصية يسهل تخمينها مثل تاريخ ميلادك أو اسم حيوانك الأليف.',
-            'استخدم كلمة مرور مختلفة تماماً لكل حساب تمتلكه.',
-            'اعتمد على مدير كلمات مرور موثوق (مثل Bitwarden أو 1Password) لإنشاء وتخزين كلمات المرور.'
-        ]
-    },
-    {
-        icon: 'shield_with_heart',
-        title: 'تحديث الأنظمة',
-        desc: 'تأكد من تحديث نظام التشغيل والتطبيقات بشكل دوري لسد الثغرات الأمنية المكتشفة وحماية جهازك.',
-        steps: [
-            'قم بتفعيل ميزة التحديث التلقائي لنظام التشغيل الخاص بك.',
-            'حدّث متصفح الويب والبرامج الأساسية بمجرد توفر إصدارات جديدة.',
-            'لا تؤجل التحديثات الأمنية العاجلة، فهي غالباً ما تسد ثغرات خطيرة.',
-            'تخلص من التطبيقات والبرامج القديمة التي لم تعد تتلقى دعماً فنياً.'
-        ]
-    },
-    {
-        icon: 'wifi',
-        title: 'الشبكات العامة',
-        desc: 'تجنب الوصول إلى حساباتك الحساسة عبر شبكات الواي فاي العامة. استخدم VPN إذا كان الاتصال ضرورياً.',
-        steps: [
-            'عطّل خيار الاتصال التلقائي بشبكات الواي فاي المفتوحة في جهازك.',
-            'تجنب إدخال بيانات الدخول لحساباتك البنكية أو الشخصية أثناء الاتصال بشبكة مقهى أو مطار.',
-            'استخدم خدمة شبكة خاصة افتراضية (VPN) موثوقة لتشفير بياناتك.',
-            'تأكد من أن المواقع التي تزورها تستخدم بروتوكول HTTPS الآمن (علامة القفل في المتصفح).'
-        ]
-    },
-    {
-        icon: 'backup',
-        title: 'النسخ الاحتياطي',
-        desc: 'احتفظ بنسخ احتياطية دورية لبياناتك الهامة بعيداً عن جهازك الرئيسي للحماية من برمجيات الفدية.',
-        steps: [
-            'قم بإعداد جدول زمني للنسخ الاحتياطي التلقائي (أسبوعياً أو شهرياً).',
-            'استخدم قاعدة 3-2-1: 3 نسخ من البيانات، على وسيطين مختلفين، وإحداها خارج الموقع.',
-            'استخدم التخزين السحابي الآمن كخيار إضافي للنسخ الاحتياطي.',
-            'افصل محرك الأقراص الصلبة الخارجي عن جهازك بعد اكتمال النسخ لتجنب إصابته ببرمجيات الفدية.'
-        ]
-    }
-];
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const idParam = urlParams.get('id');
-    const tipIndex = idParam ? parseInt(idParam) : 0;
     
-    // Check if valid tip
-    if (tipIndex >= 0 && tipIndex < tipsData.length) {
-        const tip = tipsData[tipIndex];
-        
-        document.getElementById('article-icon').textContent = tip.icon;
-        document.getElementById('article-title').textContent = tip.title;
-        document.getElementById('article-desc').textContent = tip.desc;
-        
-        const stepsContainer = document.getElementById('article-steps');
-        if (tip.steps && tip.steps.length > 0) {
-            stepsContainer.innerHTML = tip.steps.map(step => `<li>${step}</li>`).join('');
-        } else {
-            stepsContainer.parentElement.style.display = 'none';
+    const titleEl = document.getElementById('article-title');
+    const descEl = document.getElementById('article-desc');
+    const stepsContainer = document.getElementById('article-steps');
+    const iconEl = document.getElementById('article-icon');
+    const quizBtn = document.getElementById('quiz-btn');
+    
+    if (!idParam) {
+        if (titleEl) titleEl.textContent = 'النصيحة غير موجودة';
+        if (descEl) descEl.textContent = 'عذراً، لم يتم توفير معرف النصيحة.';
+        if (stepsContainer) stepsContainer.parentElement.style.display = 'none';
+        if (quizBtn) quizBtn.style.display = 'none';
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/api/tips/${idParam}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = 'login.html';
+                return;
+            }
+            throw new Error('Tip not found');
         }
-    } else {
-        document.getElementById('article-title').textContent = 'النصيحة غير موجودة';
-        document.getElementById('article-desc').textContent = 'عذراً، لم نتمكن من العثور على المعلومات المطلوبة.';
-        document.getElementById('article-steps').parentElement.style.display = 'none';
+
+        const tip = await response.json();
+        
+        if (iconEl && tip.icon) iconEl.textContent = tip.icon;
+        if (titleEl) titleEl.textContent = tip.title;
+        if (descEl) descEl.textContent = tip.description;
+        
+        if (stepsContainer) {
+            if (tip.steps && tip.steps.length > 0) {
+                stepsContainer.innerHTML = tip.steps.map(step => `<li>${step}</li>`).join('');
+            } else {
+                stepsContainer.parentElement.style.display = 'none';
+            }
+        }
+
+        if (quizBtn) {
+            quizBtn.addEventListener('click', () => {
+                window.location.href = 'quiz.html?tipId=' + idParam;
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        if (titleEl) titleEl.textContent = 'النصيحة غير موجودة';
+        if (descEl) descEl.textContent = 'عذراً، لم نتمكن من العثور على المعلومات المطلوبة.';
+        if (stepsContainer) stepsContainer.parentElement.style.display = 'none';
+        if (quizBtn) quizBtn.style.display = 'none';
     }
 });

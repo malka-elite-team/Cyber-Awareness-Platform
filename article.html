@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="css/global.css">
-    <script src="js/article.js"></script>
+    <script type="module" src="js/article.js"></script>
 </head>
 <body class="bg-[#f3fcef] text-[#161d16] font-['Inter'] antialiased min-h-screen">
     <!-- TopAppBar -->
@@ -43,7 +43,7 @@
             </div>
 
             <div class="mt-12 flex justify-end">
-                <button onclick="window.location.href='quiz.html'" class="inline-flex items-center gap-2 bg-[#22C55E] hover:bg-[#1eb054] text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform hover:-translate-y-1">
+                <button id="quiz-btn" class="inline-flex items-center gap-2 bg-[#22C55E] hover:bg-[#1eb054] text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform hover:-translate-y-1">
                     <span class="material-symbols-outlined">shield</span>
                     <span>اختبر معلوماتك الآن</span>
                 </button>

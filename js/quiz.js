@@ -160,6 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
             actionBtn.textContent = 'جاري إرسال الإجابات...';
             
             const token = localStorage.getItem('token');
+            const urlParams = new URLSearchParams(window.location.search);
+            const tipId = urlParams.get('tipId');
+            
+            const payload = { answers: userAnswers };
+            if (tipId) {
+                payload.tipId = tipId;
+            }
+
             const response = await fetch(`${API_BASE_URL}/api/quiz/submit`, {
                 method: 'POST',
                 headers: { 
@@ -167,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     "Authorization": `Bearer ${token}`,
                     "ngrok-skip-browser-warning": "true"
                 },
-                body: JSON.stringify({ answers: userAnswers })
+                body: JSON.stringify(payload)
             });
             
             if (!response.ok) throw new Error('Failed to submit quiz');
@@ -220,7 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadQuestionsFromAPI() {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/quiz/questions`, {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tipId = urlParams.get('tipId');
+            
+            let url = `${API_BASE_URL}/api/quiz/questions`;
+            if (tipId) {
+                url += `?tipId=${tipId}`;
+            }
+
+            const response = await fetch(url, {
                 headers: { 
                     "Authorization": `Bearer ${token}`,
                     "ngrok-skip-browser-warning": "true"
