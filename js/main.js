@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './config.js';
+
 tailwind.config = {
     darkMode: "class",
     theme: {
@@ -89,67 +91,72 @@ tailwind.config = {
     }
 }
 
-const tipsData = [
-    {
-        icon: 'lock_person',
-        title: 'كيف تحمي حسابك',
-        desc: 'استخدم المصادقة الثنائية (2FA) لإضافة طبقة أمان إضافية تحمي حساباتك من الاختراق حتى لو تم تسريب كلمة المرور.'
-    },
-    {
-        icon: 'mail',
-        title: 'تأمين البريد الإلكتروني',
-        desc: 'كن حذراً من رسائل التصيد الاحتيالي. لا تنقر على روابط مشبوهة أو تحمل ملفات من مصادر غير معروفة أبداً.'
-    },
-    {
-        icon: 'password',
-        title: 'إدارة كلمات المرور',
-        desc: 'استخدم كلمات مرور قوية وفريدة لكل حساب. ننصح باستخدام برامج إدارة كلمات المرور لتخزينها بأمان.'
-    },
-    {
-        icon: 'shield_with_heart',
-        title: 'تحديث الأنظمة',
-        desc: 'تأكد من تحديث نظام التشغيل والتطبيقات بشكل دوري لسد الثغرات الأمنية المكتشفة وحماية جهازك.'
-    },
-    {
-        icon: 'wifi',
-        title: 'الشبكات العامة',
-        desc: 'تجنب الوصول إلى حساباتك الحساسة عبر شبكات الواي فاي العامة. استخدم VPN إذا كان الاتصال ضرورياً.'
-    },
-    {
-        icon: 'backup',
-        title: 'النسخ الاحتياطي',
-        desc: 'احتفظ بنسخ احتياطية دورية لبياناتك الهامة بعيداً عن جهازك الرئيسي للحماية من برمجيات الفدية.'
-    }
-];
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const grid = document.getElementById('tips-grid');
     if (grid) {
-        grid.innerHTML = tipsData.map((tip, index) => `
-        <div class="bg-white border border-gray-200 rounded-lg p-md hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all group relative overflow-hidden flex flex-col">
-        <div class="absolute top-0 right-0 w-1.5 h-full bg-primary-container"></div>
-        <div class="flex items-start gap-4 mb-4">
-        <div class="w-12 h-12 shrink-0 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary-container">
-        <span class="material-symbols-outlined">${tip.icon}</span>
-        </div>
-        <div class="flex-1">
-        <h4 class="font-h3 text-[20px] text-primary mb-xs">${tip.title}</h4>
-        <p class="font-body-md text-secondary leading-relaxed">${tip.desc}</p>
-        </div>
-        </div>
-        <div class="mt-auto pt-2">
-        <button onclick="window.location.href='article.html?id=${index}'" class="w-full py-2 bg-primary-container text-white font-label-bold rounded-lg hover:opacity-90 transition-opacity">اقرأ المزيد</button>
-        </div>
-        </div>
-        `).join('');
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_BASE_URL}/api/tips`, {
+                headers: { 
+                    "Authorization": `Bearer ${token}`,
+                    "ngrok-skip-browser-warning": "true"
+                }
+            });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.logout();
+                    return;
+                }
+                throw new Error('Failed to fetch tips');
+            }
+            
+            const tipsData = await response.json();
+            
+            grid.innerHTML = tipsData.map(tip => `
+            <div class="bg-white border border-gray-200 rounded-lg p-md hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all group relative overflow-hidden flex flex-col">
+            <div class="absolute top-0 right-0 w-1.5 h-full bg-primary-container"></div>
+            <div class="flex items-start gap-4 mb-4">
+            <div class="w-12 h-12 shrink-0 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary-container">
+            <span class="material-symbols-outlined">${tip.icon}</span>
+            </div>
+            <div class="flex-1">
+            <h4 class="font-h3 text-[20px] text-primary mb-xs">${tip.title}</h4>
+            <p class="font-body-md text-secondary leading-relaxed">${tip.description || tip.desc}</p>
+            </div>
+            </div>
+            <div class="mt-auto pt-2">
+            <button onclick="window.location.href='article.html?id=${tip.id}'" class="w-full py-2 bg-primary-container text-white font-label-bold rounded-lg hover:opacity-90 transition-opacity">اقرأ المزيد</button>
+            </div>
+            </div>
+            `).join('');
+        } catch (error) {
+            console.error(error);
+            grid.innerHTML = '<p class="text-error col-span-full text-center py-4">حدث خطأ أثناء تحميل النصائح. يرجى المحاولة لاحقاً.</p>';
+        }
     }
 });
 
-if (localStorage.getItem('isLoggedIn') !== 'true') {
+if (!localStorage.getItem('token')) {
     window.location.href = 'login.html';
 }
 
-function logout() {
+window.logout = async function() {
+    try {
+        const token = localStorage.getItem('token');
+        if (token) {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
+                method: 'POST',
+                headers: { 
+                    "Authorization": `Bearer ${token}`,
+                    "ngrok-skip-browser-warning": "true"
+                }
+            });
+        }
+    } catch (e) {
+        console.error('Logout error:', e);
+    }
+    localStorage.removeItem('token');
     localStorage.removeItem('isLoggedIn');
     window.location.href = 'login.html';
 }

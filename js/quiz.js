@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './config.js';
+
 tailwind.config = {
         darkMode: "class",
         theme: {
@@ -91,44 +93,11 @@ tailwind.config = {
         },
       }
 
-const questions = [
-    {
-        question: "ما هي كلمة المرور القوية؟",
-        options: ["123456", "password", "Ab#9kL!2", "myname"],
-        correctIndex: 2,
-        hint: "تذكر: كلمة المرور هي مفتاح هويتك الرقمية الوحيد."
-    },
-    {
-        question: "ما هو أفضل تصرف عند استلام إيميل مجهول يطلب بياناتك؟",
-        options: ["الرد بالبيانات المطلوبة", "تجاهل وحذف الإيميل", "الضغط على الرابط المرفق", "توجيه الإيميل للأصدقاء"],
-        correctIndex: 1,
-        hint: "لا تثق بالمرسلين المجهولين أبداً."
-    },
-    {
-        question: "ما هي المصادقة الثنائية (2FA)؟",
-        options: ["استخدام كلمتي مرور", "طبقة حماية إضافية تتطلب خطوتين", "تغيير كلمة المرور مرتين", "برنامج مكافحة فيروسات"],
-        correctIndex: 1,
-        hint: "تعتمد على شيء تعرفه وشيء تملكه."
-    },
-    {
-        question: "كيف تحمي بياناتك من فيروسات الفدية؟",
-        options: ["الدفع للمخترق", "عمل نسخ احتياطي دوري", "إغلاق الحاسوب", "تغيير الشاشة"],
-        correctIndex: 1,
-        hint: "النسخ الاحتياطي هو الحل الأضمن لاستعادة الملفات."
-    },
-    {
-        question: "ما هو الخطر الرئيسي لشبكات الواي فاي العامة؟",
-        options: ["بطء الإنترنت", "انقطاع الاتصال", "اعتراض البيانات من قِبل المخترقين", "استهلاك بطارية الجهاز"],
-        correctIndex: 2,
-        hint: "تجنب المعاملات البنكية على الشبكات المفتوحة."
-    }
-];
-
+let questions = [];
+let userAnswers = [];
 let currentQuestionIndex = 0;
-let score = 0;
-let hasAnswered = false;
 
-if (localStorage.getItem('isLoggedIn') !== 'true') {
+if (!localStorage.getItem('token')) {
     window.location.href = 'login.html';
 }
 
@@ -150,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!quizScreen) return;
 
     function loadQuestion() {
-        hasAnswered = false;
+        if (questions.length === 0) return;
+        
         const q = questions[currentQuestionIndex];
         
         questionCountEl.textContent = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
@@ -181,60 +151,95 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         feedbackBox.classList.add('hidden');
-        actionBtn.textContent = 'تحقق من الإجابة';
+        actionBtn.textContent = 'التالي';
     }
 
-    actionBtn.addEventListener('click', () => {
-        if (!hasAnswered) {
-            const selectedOpt = document.querySelector('input[name="security_question"]:checked');
-            if (!selectedOpt) {
-                alert('يرجى اختيار إجابة أولاً');
-                return;
-            }
-
-            const selectedIndex = parseInt(selectedOpt.value);
-            const q = questions[currentQuestionIndex];
+    async function submitQuiz() {
+        try {
+            actionBtn.disabled = true;
+            actionBtn.textContent = 'جاري إرسال الإجابات...';
             
-            hasAnswered = true;
-            feedbackBox.classList.remove('hidden');
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_BASE_URL}/api/quiz/submit`, {
+                method: 'POST',
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "ngrok-skip-browser-warning": "true"
+                },
+                body: JSON.stringify({ answers: userAnswers })
+            });
+            
+            if (!response.ok) throw new Error('Failed to submit quiz');
+            
+            const result = await response.json();
+            showResults(result);
+        } catch (error) {
+            console.error(error);
+            alert('حدث خطأ أثناء إرسال الإجابات');
+            actionBtn.disabled = false;
+            actionBtn.textContent = 'إنهاء الاختبار';
+        }
+    }
 
-            if (selectedIndex === q.correctIndex) {
-                score++;
-                feedbackBox.className = "border rounded-xl p-md flex gap-md items-start mb-lg bg-green-50 border-green-200 text-green-800";
-                feedbackIcon.textContent = "check_circle";
-                feedbackText.textContent = "إجابة صحيحة! " + q.hint;
-            } else {
-                feedbackBox.className = "border rounded-xl p-md flex gap-md items-start mb-lg bg-red-50 border-red-200 text-red-800";
-                feedbackIcon.textContent = "cancel";
-                feedbackText.textContent = "إجابة خاطئة. " + q.hint;
-            }
+    actionBtn.addEventListener('click', async () => {
+        const selectedOpt = document.querySelector('input[name="security_question"]:checked');
+        if (!selectedOpt) {
+            alert('يرجى اختيار إجابة أولاً');
+            return;
+        }
 
-            actionBtn.textContent = 'السؤال التالي';
+        const selectedIndex = parseInt(selectedOpt.value);
+        userAnswers.push(selectedIndex);
+        
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
         } else {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                loadQuestion();
-            } else {
-                showResults();
-            }
+            await submitQuiz();
         }
     });
 
-    function showResults() {
+    function showResults(result) {
         quizScreen.classList.add('hidden');
         resultScreen.classList.remove('hidden');
-        finalScoreEl.textContent = `${score} / ${questions.length}`;
+        finalScoreEl.textContent = `${result.score} / ${result.total} (${result.percentage}%)`;
         progressBarEl.style.width = `100%`;
         progressTextEl.textContent = `100% مكتمل`;
     }
 
     retryBtn.addEventListener('click', () => {
         currentQuestionIndex = 0;
-        score = 0;
+        userAnswers = [];
         resultScreen.classList.add('hidden');
         quizScreen.classList.remove('hidden');
+        actionBtn.disabled = false;
         loadQuestion();
     });
 
-    loadQuestion();
+    async function loadQuestionsFromAPI() {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_BASE_URL}/api/quiz/questions`, {
+                headers: { 
+                    "Authorization": `Bearer ${token}`,
+                    "ngrok-skip-browser-warning": "true"
+                }
+            });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                throw new Error('Failed to fetch questions');
+            }
+            questions = await response.json();
+            loadQuestion();
+        } catch (error) {
+            console.error(error);
+            questionTextEl.textContent = "حدث خطأ أثناء تحميل الأسئلة.";
+        }
+    }
+
+    loadQuestionsFromAPI();
 });

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './config.js';
+
 tailwind.config = {
         darkMode: "class",
         theme: {
@@ -93,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Login Logic
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
-        loginBtn.addEventListener('click', (e) => {
+        loginBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const emailInput = document.getElementById('login-email');
             const passwordInput = document.getElementById('login-password');
@@ -106,15 +108,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 passwordInput.classList.remove('border-outline-variant');
                 passwordInput.classList.add('border-error');
             } else {
-                errorMsg.classList.add('hidden');
-                emailInput.classList.remove('border-error');
-                emailInput.classList.add('border-outline-variant');
-                passwordInput.classList.remove('border-error');
-                passwordInput.classList.add('border-outline-variant');
-                
-                localStorage.setItem('isLoggedIn', 'true');
-                alert('تم تسجيل الدخول بنجاح!');
-                window.location.href = 'index.html';
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        },
+                        body: JSON.stringify({
+                            email: emailInput.value.trim(),
+                            password: passwordInput.value.trim()
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'الإيميل أو كلمة المرور غير الصحيحة');
+                    }
+                    
+                    errorMsg.classList.add('hidden');
+                    emailInput.classList.remove('border-error');
+                    emailInput.classList.add('border-outline-variant');
+                    passwordInput.classList.remove('border-error');
+                    passwordInput.classList.add('border-outline-variant');
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    alert('تم تسجيل الدخول بنجاح!');
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    errorMsg.innerHTML = `${error.message} <span class="material-symbols-outlined text-[16px]">error</span>`;
+                    errorMsg.classList.remove('hidden');
+                }
             }
         });
     }
@@ -122,25 +148,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // Signup Logic
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
-        signupForm.addEventListener('submit', (e) => {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value;
             const confirmPassword = document.getElementById('signup-confirm-password').value;
             const errorMsg = document.getElementById('signup-error');
             const confirmInput = document.getElementById('signup-confirm-password');
+            const errorMsgText = errorMsg.querySelector('p');
             
             if (password !== confirmPassword) {
                 errorMsg.classList.remove('hidden');
+                if (errorMsgText) errorMsgText.textContent = 'كلمتا المرور غير متطابقتين';
                 confirmInput.classList.add('border-error');
                 confirmInput.classList.remove('border-gray-200');
             } else {
-                errorMsg.classList.add('hidden');
-                confirmInput.classList.remove('border-error');
-                confirmInput.classList.add('border-gray-200');
-                
-                localStorage.setItem('isLoggedIn', 'true');
-                alert('تم إنشاء الحساب بنجاح!');
-                window.location.href = 'index.html';
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'حدث خطأ أثناء إنشاء الحساب');
+                    }
+                    
+                    errorMsg.classList.add('hidden');
+                    confirmInput.classList.remove('border-error');
+                    confirmInput.classList.add('border-gray-200');
+                    
+                    alert('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.');
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    if (errorMsgText) errorMsgText.textContent = error.message;
+                    errorMsg.classList.remove('hidden');
+                }
             }
         });
     }
