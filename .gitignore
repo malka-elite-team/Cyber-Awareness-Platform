@@ -1,0 +1,10 @@
+.gemini/
+gha-creds-*.json
+Tasks/
+.github/
+backend/node_modules/
+backend/.env
+/Docs/
+node_modules/
+postman/
+.postman
