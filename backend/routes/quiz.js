@@ -88,6 +88,7 @@ router.post('/submit', async (req, res) => {
     const userId = req.user.uid;
     const resultData = {
       userId,
+      tipId: tipId || null, // حفظ الـ tipId لمعرفة أي نصيحة تم اجتيازها
       score,
       total,
       percentage,
@@ -133,6 +134,58 @@ router.get('/results', async (req, res) => {
   } catch (error) {
     console.error('Error fetching quiz results:', error);
     res.status(500).json({ error: 'Failed to fetch results' });
+  }
+});
+
+// ==========================================
+// GET /api/quiz/progress — جلب نسبة تقدم المستخدم (Learning Progress)
+// ==========================================
+router.get('/progress', async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const db = admin.firestore();
+    
+    // 1. جلب كل النصائح لمعرفة العدد الكلي
+    const tipsSnapshot = await db.collection('tips').get();
+    const totalTips = tipsSnapshot.size;
+    const allTipsIds = [];
+    tipsSnapshot.forEach(doc => allTipsIds.push(doc.id));
+
+    // 2. جلب نتائج المستخدم الناجحة لمعرفة النصائح المنجزة
+    const resultsSnapshot = await db.collection('quiz_results')
+      .where('userId', '==', userId)
+      .get();
+    
+    const completedTipIds = new Set();
+    resultsSnapshot.forEach(doc => {
+      const data = doc.data();
+      // نعتبر النصيحة منجزة إذا كان المستخدم قد جرب الكويز وحصل على أي نتيجة (أو يمكنك اشتراط نسبة معينة)
+      if (data.tipId && data.percentage > 0) {
+        completedTipIds.add(data.tipId);
+      }
+    });
+
+    const completedTipsCount = completedTipIds.size;
+    const progressPercentage = totalTips > 0 ? Math.round((completedTipsCount / totalTips) * 100) : 0;
+
+    // 3. تحديد النصيحة التالية (أول نصيحة غير منجزة)
+    let nextTipId = null;
+    for (const tipId of allTipsIds) {
+      if (!completedTipIds.has(tipId)) {
+        nextTipId = tipId;
+        break;
+      }
+    }
+
+    res.status(200).json({
+      completedTips: completedTipsCount,
+      totalTips: totalTips,
+      progressPercentage: progressPercentage,
+      nextTipId: nextTipId // قد تكون null إذا أكمل كل شيء
+    });
+  } catch (error) {
+    console.error('Error fetching progress:', error);
+    res.status(500).json({ error: 'Failed to fetch progress' });
   }
 });
 

@@ -258,11 +258,28 @@
 ### 5.4 Collection: `quiz_results`
 | Field | Type | Description |
 |---|---|---|
-| userId | String | معرف المستخدم صاحب النتيجة |
-| score | Number | عدد الإجابات الصحيحة |
-| total | Number | إجمالي عدد الأسئلة |
-| percentage | Number | النسبة المئوية (80، 100، إلخ) |
-| date | Timestamp | تاريخ تقديم الاختبار |
+| userId | String | مُعرّف المستخدم |
+| tipId | String | مُعرّف النصيحة (null إذا كان امتحاناً شاملاً) |
+| score | Number | الإجابات الصحيحة |
+| total | Number | إجمالي الأسئلة |
+| percentage | Number | النسبة المئوية |
+| date | Timestamp | تاريخ التقديم |
+
+---
+
+### 🌟 جديد: جلب نسبة التقدم (Learning Progress)
+**`GET /api/quiz/progress`**
+يجلب إحصائيات تقدم المستخدم في تعلم النصائح (يُستخدم في الصفحة الرئيسية).
+* **Headers:** `Authorization: Bearer <token>` (مطلوب)
+* **Response (200 OK):**
+```json
+{
+  "completedTips": 3,
+  "totalTips": 6,
+  "progressPercentage": 50,
+  "nextTipId": "tip_004"
+}
+```
 
 ---
 
